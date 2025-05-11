@@ -1,4 +1,6 @@
+import { Request } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -18,3 +20,9 @@ export const decodeJWT = (token: string): JwtPayload | null => {
         return null;
     }
 };
+
+export const getIdFromToken = (req: Request): Types.ObjectId  => {
+    const accessToken = (req.headers["authorization"] as string).split(" ")[1];
+    const payload = decodeJWT(accessToken);
+    return payload?._id as Types.ObjectId;
+}

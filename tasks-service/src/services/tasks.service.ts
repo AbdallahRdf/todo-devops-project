@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { ITask, Task } from "../models/tasks.model";
 import { AppError } from "../utils/AppError";
 
-const getTasks = async (userId: string) => {
+const getTasks = async (userId: Types.ObjectId) => {
     const tasks = await Task.find({ userId }, { __v: 0, userId: 0, createdAt: 0, updatedAt: 0 });
     return tasks;
 }
