@@ -52,10 +52,20 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+const getProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await userService.getProfile(req.params.username as string);
+        res.status(200).json({ user });
+    } catch (error) {
+        next(error);
+    }
+}
+
 const userController = {
     signup,
     login,
-    logout
+    logout,
+    getProfile
 };
 
 export default userController;

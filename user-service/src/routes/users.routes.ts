@@ -9,4 +9,6 @@ usersRouter.post("/auth/login", userController.login);
 
 usersRouter.post("/auth/logout", userController.logout);
 
+usersRouter.get("/users/:username", userController.getProfile);
+
 export default usersRouter;

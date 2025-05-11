@@ -32,10 +32,18 @@ const logout = async (refreshToken: string) => {
     await user.save();
 }
 
+const getProfile = async (username: string) => {
+    const user = await User.findOne({ username }, {firstName: true, lastName: true, username: true, email: true});
+    if(!user) 
+        throw new AppError("User not found", 404);
+    return user;
+}
+
 const userService = {
     signup,
     login,
-    logout
+    logout,
+    getProfile
 }
 
 export default userService;
