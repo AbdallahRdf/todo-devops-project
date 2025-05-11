@@ -30,11 +30,16 @@ const updateTask = async (taskId: string, task: Omit<ITask, "userId">, userId: T
     return updatedTask;
 }
 
+const deleteTask = async (taskId: string, userId: Types.ObjectId) => {
+    await Task.findOneAndDelete({ _id: taskId, userId });
+}
+
 const tasksService = {
     getTasks,
     createTask,
     getTask,
     updateTask,
+    deleteTask
 }
 
 export default tasksService;

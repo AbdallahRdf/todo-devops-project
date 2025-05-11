@@ -65,11 +65,25 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const accessToken = (req.headers["authorization"] as string).split(" ")[1];
+        const payload = decodeJWT(accessToken);
+
+        const taskId = req.params.id;
+        await tasksService.deleteTask(taskId, payload?._id as Types.ObjectId);
+        res.status(204).json();
+    } catch (error) {
+        next(error);
+    }
+}
+
 const tasksController = {
     getTasks,
     createTask,
     getTask,
     updateTask,
+    deleteTask
 }
 
 export default tasksController;
