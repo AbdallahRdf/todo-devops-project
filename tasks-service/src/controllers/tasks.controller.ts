@@ -50,10 +50,26 @@ const getTask = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const updateTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const accessToken = (req.headers["authorization"] as string).split(" ")[1];
+        const payload = decodeJWT(accessToken);
+
+        const taskId = req.params.id;
+        const taskData = {...matchedData(req)} as Omit<ITask, "userId">;
+
+        const task = await tasksService.updateTask(taskId, taskData, payload?._id as Types.ObjectId);
+        res.status(200).json(task);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const tasksController = {
     getTasks,
     createTask,
-    getTask
+    getTask,
+    updateTask,
 }
 
 export default tasksController;

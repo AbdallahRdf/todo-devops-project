@@ -19,10 +19,22 @@ const getTask = async (taskId: string, userId: Types.ObjectId) => {
     return task;
 }
 
+const updateTask = async (taskId: string, task: Omit<ITask, "userId">, userId: Types.ObjectId) => {
+    const updatedTask = await Task.findOneAndUpdate(
+        { _id: taskId, userId },
+        { ...task },
+        { new: true, runValidators: true }
+    );
+    if (!updatedTask)
+        throw new AppError("Task not found", 404);
+    return updatedTask;
+}
+
 const tasksService = {
     getTasks,
     createTask,
-    getTask
+    getTask,
+    updateTask,
 }
 
 export default tasksService;
