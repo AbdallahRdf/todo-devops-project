@@ -5,7 +5,7 @@ export interface ITask extends Document {
     title: string;
     description: string;
     status: string;
-    dueDate: Date;
+    dueDate?: Date;
     priority: string;
     userId: Types.ObjectId
 }
@@ -26,7 +26,7 @@ const taskSchema = new Schema<ITask>({
     },
     dueDate: {
         type: Date,
-        required: true,
+        required: false,
     },
     priority: {
         type: String,

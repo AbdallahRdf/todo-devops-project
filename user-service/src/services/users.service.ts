@@ -2,12 +2,40 @@ import { IUser, User } from "../models/user.model";
 import bcrypt from "bcryptjs";
 import { Response } from "express";
 import { AppError } from "../utils/AppError";
-import { handleTokens } from "../utils/tokenHandler";
+import { generateToken } from "../utils/jwt";
 
 const signup = async (res: Response, userData: Pick<IUser, "firstName" | "lastName" | "username" | "email" | "password">) => {
     userData.password = await bcrypt.hash(userData.password, 10);
     const user = new User(userData);
-    return handleTokens(user, res);
+    await user.save();
+
+    const newUser = await User.findOne({ email: userData.email });
+
+    if (!newUser)
+        throw new AppError("User not found", 404);
+
+    const payload = {
+        _id: newUser._id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        username: newUser.username,
+        email: newUser.email,
+    };
+
+    const accessToken = generateToken(payload, "30min");
+    const refreshToken = generateToken(payload, "3d");
+
+    user.refreshTokens?.push(refreshToken);
+    await user.save();
+
+    res.cookie("refresh-token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+    });
+
+    return accessToken;
 }
 
 const login = async (res: Response, userCredentials: Pick<IUser, "password" | "email">) => {
@@ -20,7 +48,28 @@ const login = async (res: Response, userCredentials: Pick<IUser, "password" | "e
     if (!isMatch)
         throw new AppError("Invalid credentials", 400);
 
-    return handleTokens(user, res);
+    const payload = {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+    };
+
+    const accessToken = generateToken(payload, "30min");
+    const refreshToken = generateToken(payload, "3d");
+
+    user.refreshTokens?.push(refreshToken);
+    await user.save();
+
+    res.cookie("refresh-token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+    });
+
+    return accessToken;
 }
 
 const logout = async (refreshToken: string) => {

@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import tasksService from "../services/tasks.service";
 import { decodeJWT } from "../utils/jwt";
+import { matchedData, validationResult } from "express-validator";
+import { Types } from "mongoose";
+import { ITask } from "../models/tasks.model";
 
 const getTasks = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -14,8 +17,29 @@ const getTasks = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const createTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = validationResult(req);
+
+        if (!result.isEmpty())
+            res.status(400).json({ errors: result.array() });
+
+        const taskData = {...matchedData(req)} as Omit<ITask, "userId">;
+
+        const accessToken = (req.headers["authorization"] as string).split(" ")[1];
+        const payload = decodeJWT(accessToken);
+        console.log(payload);
+
+        const task = await tasksService.createTask(taskData, payload?._id as Types.ObjectId);
+        res.status(201).json(task);
+    } catch (error) {
+        next(error);    
+    }
+}
+
 const tasksController = {
-    getTasks
+    getTasks,
+    createTask
 }
 
 export default tasksController;
