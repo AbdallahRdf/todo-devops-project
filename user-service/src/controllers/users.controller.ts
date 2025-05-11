@@ -70,12 +70,29 @@ const updateProfile = async (req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await userService.deleteUser(req.params.username);
+
+        res.clearCookie("refresh-token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "none",
+        });
+
+        res.status(200).json({ message: "User was deleted successfully" })
+    } catch (error) {
+        next(error);
+    }
+}
+
 const userController = {
     signup,
     login,
     logout,
     getProfile,
-    updateProfile
+    updateProfile,
+    deleteUser
 };
 
 export default userController;

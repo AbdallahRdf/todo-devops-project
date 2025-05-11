@@ -13,4 +13,6 @@ usersRouter.get("/users/:username", userController.getProfile);
 
 usersRouter.put("/users/", userController.updateProfile);
 
+usersRouter.delete("/users/:username", userController.deleteUser);
+
 export default usersRouter;

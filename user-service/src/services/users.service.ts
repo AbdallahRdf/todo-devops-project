@@ -33,14 +33,14 @@ const logout = async (refreshToken: string) => {
 }
 
 const get = async (username: string) => {
-    const user = await User.findOne({ username }, {firstName: true, lastName: true, username: true, email: true});
-    if(!user) 
+    const user = await User.findOne({ username }, { firstName: true, lastName: true, username: true, email: true });
+    if (!user)
         throw new AppError("User not found", 404);
     return user;
 }
 
 const update = async (newUserData: Pick<IUser, "firstName" | "lastName" | "username" | "email" | "password">) => {
-    const user = await User.findOne({ email: newUserData.email },  {firstName: true, lastName: true, username: true, email: true});
+    const user = await User.findOne({ email: newUserData.email }, { firstName: true, lastName: true, username: true, email: true });
     if (!user)
         throw new AppError("User not found", 404);
 
@@ -60,12 +60,17 @@ const update = async (newUserData: Pick<IUser, "firstName" | "lastName" | "usern
     };
 }
 
+const deleteUser = async (username: string) => {
+    await User.deleteOne({ username });
+}
+
 const userService = {
     signup,
     login,
     logout,
     get,
-    update
+    update,
+    deleteUser
 }
 
 export default userService;
