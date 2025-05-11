@@ -7,4 +7,6 @@ usersRouter.post("/auth/signup", userController.signup);
 
 usersRouter.post("/auth/login", userController.login);
 
+usersRouter.post("/auth/logout", userController.logout);
+
 export default usersRouter;

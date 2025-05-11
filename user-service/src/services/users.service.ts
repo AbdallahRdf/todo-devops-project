@@ -17,15 +17,25 @@ const login = async (res: Response, userCredentials: Pick<IUser, "password" | "e
         throw new AppError("User not found", 404);
 
     const isMatch = await bcrypt.compare(userCredentials.password, user.password);
-    if (!isMatch) 
+    if (!isMatch)
         throw new AppError("Invalid credentials", 400);
-    
+
     return handleTokens(user, res);
+}
+
+const logout = async (refreshToken: string) => {
+    const user = await User.findOne({ refreshTokens: { $in: [refreshToken] } }, { refreshTokens: true });
+    if (!user)
+        throw new AppError("User not found", 404);
+
+    user.refreshTokens = user.refreshTokens?.filter((token: string) => token !== refreshToken) as typeof user.refreshTokens;
+    await user.save();
 }
 
 const userService = {
     signup,
-    login
+    login,
+    logout
 }
 
 export default userService;
