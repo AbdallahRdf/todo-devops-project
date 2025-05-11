@@ -37,9 +37,23 @@ const createTask = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
+const getTask = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const accessToken = (req.headers["authorization"] as string).split(" ")[1];
+        const payload = decodeJWT(accessToken);
+
+        const taskId = req.params.id;
+        const task = await tasksService.getTask(taskId, payload?._id as Types.ObjectId);
+        res.status(200).json(task);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const tasksController = {
     getTasks,
-    createTask
+    createTask,
+    getTask
 }
 
 export default tasksController;
