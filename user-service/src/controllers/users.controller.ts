@@ -1,12 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import userService from "../services/users.service";
+import { matchedData, validationResult } from "express-validator";
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
-    const { firstName, lastName, username, email, password } = req.body;
 
-    if (!firstName || !lastName || !username || !password || !email) {
-        res.status(400).json({ message: "All fields are required" });
-    }
+    const result = validationResult(req);
+
+    if (!result.isEmpty())
+        res.status(400).json({ errors: result.array() });
+
+    const { firstName, lastName, username, email, password } = matchedData(req);
 
     try {
         const accessToken = await userService.signup(res, { firstName, lastName, username, email, password });
@@ -17,11 +20,12 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+    const result = validationResult(req);
 
-    if (!password || !email) {
-        res.status(400).json({ message: "All fields are required" });
-    }
+    if (!result.isEmpty())
+        res.status(400).json({ errors: result.array() });
+
+    const { email, password } = matchedData(req);
 
     try {
         const accessToken = await userService.login(res, { email, password });
@@ -54,7 +58,14 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
 
 const getProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await userService.get(req.params.username as string);
+        const result = validationResult(req);
+
+        if (!result.isEmpty())
+            res.status(400).json({ errors: result.array() });
+
+        const { username } = matchedData(req);
+
+        const user = await userService.get(username);
         res.status(200).json({ user });
     } catch (error) {
         next(error);
@@ -63,7 +74,12 @@ const getProfile = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await userService.update(req.body);
+        const result = validationResult(req);
+
+        if (!result.isEmpty())
+            res.status(400).json({ errors: result.array() });
+
+        const user = await userService.update(matchedData(req));
         res.status(200).json({ user });
     } catch (error) {
         next(error);
@@ -72,7 +88,14 @@ const updateProfile = async (req: Request, res: Response, next: NextFunction) =>
 
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await userService.deleteUser(req.params.username);
+        const result = validationResult(req);
+
+        if (!result.isEmpty())
+            res.status(400).json({ errors: result.array() });
+
+        const { username } = matchedData(req);
+
+        await userService.deleteUser(username);
 
         res.clearCookie("refresh-token", {
             httpOnly: true,
