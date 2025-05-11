@@ -32,18 +32,40 @@ const logout = async (refreshToken: string) => {
     await user.save();
 }
 
-const getProfile = async (username: string) => {
+const get = async (username: string) => {
     const user = await User.findOne({ username }, {firstName: true, lastName: true, username: true, email: true});
     if(!user) 
         throw new AppError("User not found", 404);
     return user;
 }
 
+const update = async (newUserData: Pick<IUser, "firstName" | "lastName" | "username" | "email" | "password">) => {
+    const user = await User.findOne({ email: newUserData.email },  {firstName: true, lastName: true, username: true, email: true});
+    if (!user)
+        throw new AppError("User not found", 404);
+
+    user.firstName = newUserData.firstName;
+    user.lastName = newUserData.lastName;
+    user.username = newUserData.username;
+    user.password = await bcrypt.hash(newUserData.password, 10);
+
+    await user.save();
+
+    return {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email
+    };
+}
+
 const userService = {
     signup,
     login,
     logout,
-    getProfile
+    get,
+    update
 }
 
 export default userService;

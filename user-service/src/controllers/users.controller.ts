@@ -54,7 +54,16 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
 
 const getProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await userService.getProfile(req.params.username as string);
+        const user = await userService.get(req.params.username as string);
+        res.status(200).json({ user });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await userService.update(req.body);
         res.status(200).json({ user });
     } catch (error) {
         next(error);
@@ -65,7 +74,8 @@ const userController = {
     signup,
     login,
     logout,
-    getProfile
+    getProfile,
+    updateProfile
 };
 
 export default userController;
