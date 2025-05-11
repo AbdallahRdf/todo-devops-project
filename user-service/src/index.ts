@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose, { mongo } from "mongoose";
 import usersRouter from './routes/users.routes';
 import cookieParser from "cookie-parser";
+import { errorHandler } from './middlewares/errorHandler';
+import morgan from "morgan";
 
 const PORT = process.env.PORT || 3001;
 const URI = process.env.MONGODB_CONNECTION_STRING;
@@ -23,7 +25,10 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
-app.use('/api/v1/users', usersRouter);
+app.use('/api', usersRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`User service is running on port ${PORT}`));

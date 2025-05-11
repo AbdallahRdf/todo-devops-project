@@ -1,38 +1,31 @@
 import { IUser, User } from "../models/user.model";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/jwt";
 import { Response } from "express";
+import { AppError } from "../utils/AppError";
+import { handleTokens } from "../utils/tokenHandler";
 
 const signup = async (res: Response, userData: Pick<IUser, "firstName" | "lastName" | "username" | "email" | "password">) => {
     userData.password = await bcrypt.hash(userData.password, 10);
     const user = new User(userData);
+    return handleTokens(user, res);
+}
 
-    const payload = {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        email: user.email
-    };
+const login = async (res: Response, userCredentials: Pick<IUser, "password" | "email">) => {
+    const user = await User.findOne({ email: userCredentials.email });
 
-    const accessToken = generateToken(payload, '30min');
-    const refreshToken = generateToken(payload, '3d');
+    if (!user)
+        throw new AppError("User not found", 404);
 
-    user.refreshTokens?.push(refreshToken);
-
-    await user.save();
-
-    res.cookie("refresh-token", refreshToken, {
-        httpOnly: true,       // Secure from JS access
-        secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000, // 3 day
-    });
-
-    return accessToken;
+    const isMatch = await bcrypt.compare(userCredentials.password, user.password);
+    if (!isMatch) 
+        throw new AppError("Invalid credentials", 400);
+    
+    return handleTokens(user, res);
 }
 
 const userService = {
-    signup
+    signup,
+    login
 }
 
 export default userService;
