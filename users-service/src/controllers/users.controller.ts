@@ -12,8 +12,8 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     const { firstName, lastName, username, email, password } = matchedData(req);
 
     try {
-        const accessToken = await userService.signup(res, { firstName, lastName, username, email, password });
-        res.status(201).json({ accessToken });
+        const { accessToken, refreshToken } = await userService.signup(res, { firstName, lastName, username, email, password });
+        res.status(201).json({ accessToken, refreshToken });
     } catch (error) {
         next(error);
     }
@@ -28,8 +28,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = matchedData(req);
 
     try {
-        const accessToken = await userService.login(res, { email, password });
-        res.status(200).json({ accessToken });
+        const { accessToken, refreshToken } = await userService.login(res, { email, password });
+        res.status(200).json({ accessToken, refreshToken });
     } catch (error) {
         next(error);
     }

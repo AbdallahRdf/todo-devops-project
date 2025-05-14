@@ -1,0 +1,61 @@
+services:
+  # MongoDB service
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi9
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - todo-app-network
+
+  # Users service
+  users-service:
+    build:
+      context: ./users-service
+      dockerfile: Dockerfile
+    container_name: users-service
+    env_file:
+      - ./users-service/.env.docker
+    depends_on:
+      - mongodb
+    networks:
+      - todo-app-network
+
+  # Tasks service
+  tasks-service:
+    build:
+      context: ./tasks-service
+      dockerfile: Dockerfile
+    container_name: tasks-service
+    env_file:
+      - ./tasks-service/.env.docker
+    depends_on:
+      - mongodb
+    networks:
+      - todo-app-network
+
+  # API Gateway service
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    env_file:
+      - ./api-gateway/.env.docker
+    ports:
+      - "3000:3000"
+    depends_on:
+      - users-service
+      - tasks-service
+    networks:
+      - todo-app-network
+
+networks:
+  todo-app-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local

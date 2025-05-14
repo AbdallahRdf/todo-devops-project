@@ -11,7 +11,7 @@ if (!URI)
     throw new Error("MONGODB_CONNECTION_STRING environment variable is not defined");
 
 try {
-    const connection = mongoose.connect(URI);
+    mongoose.connect(URI);
     console.log("Tasks service is connected to the database");
 } catch (error) {
     console.log("MongoDB connection failed in tasks service.");

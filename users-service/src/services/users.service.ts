@@ -5,6 +5,11 @@ import { AppError } from "../utils/AppError";
 import { generateToken } from "../utils/jwt";
 
 const signup = async (res: Response, userData: Pick<IUser, "firstName" | "lastName" | "username" | "email" | "password">) => {
+    // check if email and username are unique
+    const existingUser = await User.findOne({ $or: [{ email: userData.email }, { username: userData.username }] });
+    if (existingUser)
+        throw new AppError("Email or username already exists", 400);
+
     userData.password = await bcrypt.hash(userData.password, 10);
     const user = new User(userData);
     await user.save();
@@ -28,14 +33,7 @@ const signup = async (res: Response, userData: Pick<IUser, "firstName" | "lastNa
     user.refreshTokens?.push(refreshToken);
     await user.save();
 
-    res.cookie("refresh-token", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
-
-    return accessToken;
+    return { accessToken, refreshToken};
 }
 
 const login = async (res: Response, userCredentials: Pick<IUser, "password" | "email">) => {
@@ -62,14 +60,7 @@ const login = async (res: Response, userCredentials: Pick<IUser, "password" | "e
     user.refreshTokens?.push(refreshToken);
     await user.save();
 
-    res.cookie("refresh-token", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-    });
-
-    return accessToken;
+    return { accessToken, refreshToken };
 }
 
 const logout = async (refreshToken: string) => {
