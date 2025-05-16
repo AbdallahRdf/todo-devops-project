@@ -1,5 +1,25 @@
+# Node.js
+node_modules/
+.env*
+*.env
+*.local
+*.log
 tsconfig.tsbuildinfo
 dist/
-node_modules/
-.env
-.env.docker
+
+
+# Docker
+*.tar
+*.pid
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+
+# Kubernetes secrets
+**/*-secret.yaml
+**/*-secrets.yaml
