@@ -14,6 +14,22 @@ spec:
     metadata:
       labels:
         app: mongodb
+      annotations:
+        ad.datadoghq.com/mongodb.checks: |
+          {
+            "mongodb": {
+              "init_config": {},
+              "instances": [
+                {
+                  "hosts": ["%%host%%:27017"],
+                  "username": "datadog",
+                  "password": "d5g_p6d!",
+                  "database": "admin"
+                }
+              ]
+            }
+          }
+        ad.datadoghq.com/mongo.logs: '[{"source":"mongodb","service":"mongodb"}]'
     spec:
       containers:
         - name: mongodb

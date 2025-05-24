@@ -5,6 +5,8 @@ metadata:
   namespace: todo-app
   labels:
     app: api-gateway
+  annotations:
+    ad.datadoghq.com/api-gateway.logs: '[{"source":"nodejs","service":"api-gateway"}]'
 spec:
   replicas: 1
   selector:
@@ -17,7 +19,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: abdallahrdf/api-gateway
+          image: abdallahrdf/api-gateway:v1.1.0
           ports:
             - containerPort: 3000
           env:

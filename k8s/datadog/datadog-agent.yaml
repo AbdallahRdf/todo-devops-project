@@ -1,0 +1,55 @@
+apiVersion: "datadoghq.com/v2alpha1"
+kind: "DatadogAgent"
+metadata:
+  name: "datadog"
+spec:
+  global:
+    site: "us5.datadoghq.com"
+    kubelet:
+      tlsVerify: false
+    tags:
+      - "env:dev"
+    credentials:
+      apiSecret:
+        secretName: "datadog-secret"
+        keyName: "api-key"
+  override:
+    nodeAgent:
+      image:
+        name: "gcr.io/datadoghq/agent:7.65.0-full"
+        pullPolicy: "Always"
+      containers:
+        otel-agent:
+          env:
+            - name: "DD_OTELCOLLECTOR_ENABLED"
+              value: "true"
+          volumeMounts:
+            - name: nodejs-log-config
+              mountPath: /etc/datadog-agent/conf.d/nodejs.d
+              readOnly: true
+      volumes:
+        - name: nodejs-log-config
+          configMap:
+            name: datadog-nodejs-logs
+      
+  features:
+    apm:
+      enabled: true
+    eventCollection:
+      collectKubernetesEvents: true
+    liveProcessCollection:
+      enabled: true
+    liveContainerCollection:
+      enabled: true
+    logCollection:
+      enabled: true
+      containerCollectAll: true
+    otelCollector:
+      enabled: true
+      ports:
+        - containerPort: 4317
+          hostPort: 4317
+          name: "otel-grpc"
+        - containerPort: 4318
+          hostPort: 4318
+          name: "otel-http"

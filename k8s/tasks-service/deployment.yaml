@@ -5,6 +5,8 @@ metadata:
   namespace: todo-app
   labels:
     app: tasks-service
+  annotations:
+    ad.datadoghq.com/tasks-service.logs: '[{"source":"nodejs","service":"tasks-service"}]'
 spec:
   replicas: 1
   selector:

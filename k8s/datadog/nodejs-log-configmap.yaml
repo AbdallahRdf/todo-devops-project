@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-nodejs-logs
+data:
+  conf.yaml: |
+    init_config:
+    instances: []
+    logs:
+      - type: file
+        path: "/app/api-gateway/src/access.log"
+        service: api-gateway
+        source: nodejs
+        sourcecategory: sourcecode
