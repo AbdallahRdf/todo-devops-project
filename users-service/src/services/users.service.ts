@@ -101,6 +101,9 @@ const update = async (newUserData: Pick<IUser, "firstName" | "lastName" | "usern
 }
 
 const deleteUser = async (username: string) => {
+    const user = await User.findOne({ username });
+    if (!user)
+        throw new AppError("User not found", 404);
     await User.deleteOne({ username });
 }
 

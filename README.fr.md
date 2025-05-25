@@ -20,6 +20,7 @@
 * [🛠️ Commandes Utiles](#️-commandes-utiles)
 * [🧰 Stack Technique](#-stack-technique)
 * [📌 Notes](#-notes)
+* [📄 Documentation de l’API](#-documentation-de-lapi)
 * [📜 Licence](#-licence)
 * [📫 Contact](#-contact)
 
@@ -54,6 +55,7 @@
 
 * Transfère les requêtes HTTP vers les services utilisateurs et tâches.
 * Valide et vérifie les JWT dans les routes protégées.
+* 📄 Documentation de l’API : [Voir ici sur Postman](#-documentation-de-lapi)
 
 ### 👤 Service Utilisateurs
 
@@ -268,6 +270,13 @@ kubectl logs <nom-du-pod> -n todo-app
 * Les fichiers sensibles comme `.env` ne sont pas suivis par le contrôle de version.
 * Minikube doit être actif avant d'appliquer les manifests.
 * Les services sont déployés sous le namespace `todo-app`.
+
+---
+
+## 📄 Documentation de l’API
+
+Vous pouvez explorer et tester l’API REST avec Postman :
+👉 https://documenter.getpostman.com/view/28929673/2sB2qcBzvj
 
 ---
 
