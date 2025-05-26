@@ -232,7 +232,25 @@ helm install datadog-operator datadog/datadog-operator
 
 ### Step 2: Deploy Datadog Agent
 
+You first need to create the `datadog-secret.yaml` file, which contains your Datadog API key.
+
+Here is a template for the file:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: datadog-secret
+type: Opaque
+data:
+  api-key: api_key_in_base64
+```
+Then apply the following manifests:
+
 ```bash
+# Apply datadog secret
+kubectl apply -f k8s/datadog/datadog-secret.yaml
+
 # Apply Node.js logging config
 kubectl apply -f k8s/datadog/nodejs-log-configmap.yaml
 
